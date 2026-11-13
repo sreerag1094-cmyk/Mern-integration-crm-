@@ -1,4 +1,8 @@
+const dns = require('dns');
 const mongoose = require('mongoose');
+
+// Use Google Public DNS to prevent querySrv ECONNREFUSED issues on Windows/ISPs
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const connectDB = async () => {
   try {

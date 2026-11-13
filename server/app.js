@@ -8,7 +8,20 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+const clientUrl = process.env.CLIENT_URL ? process.env.CLIENT_URL.replace(/\/$/, '') : null;
+const allowedOrigins = ['http://localhost:5173', process.env.CLIENT_URL, clientUrl].filter(Boolean);
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get('/', (req, res) => res.json({ message: 'CRM API running' }));
